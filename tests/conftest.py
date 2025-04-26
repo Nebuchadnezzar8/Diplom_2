@@ -12,20 +12,37 @@ def created_user():
     password = fake.password()
     name = fake.name()
 
+    # Регистрируем пользователя
     payload = {
         "email": email,
         "password": password,
         "name": name
     }
-
     response = requests.post(TestData.REGISTER_USER_API_URL, json=payload)
 
-    return {
+    # Логинимся для получения токена
+    login_payload = {
+        "email": email,
+        "password": password
+    }
+    login_response = requests.post(TestData.LOGIN_USER_API_URL, json=login_payload)
+    access_token = login_response.json().get("accessToken")
+
+    user_data = {
         "email": email,
         "password": password,
         "name": name,
-        "response": response
+        "accessToken": access_token,
+        "register_response": response,
+        "login_response": login_response
     }
+
+    yield user_data
+
+    # Удаляем пользователя после теста
+    if access_token:
+        headers = {"Authorization": access_token}
+        requests.delete(TestData.USER_API_URL, headers=headers)
 
 
 @pytest.fixture

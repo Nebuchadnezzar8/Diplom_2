@@ -12,7 +12,7 @@ class TestCreateUser:
     def test_create_new_user_successfully(self, created_user):
         assert created_user is not None, "Созданный пользователь отсутствует"
 
-        response = created_user["response"]
+        response = created_user["register_response"]
         assert response.status_code == 200, f"Ошибка при создании пользователя: {response.text}"
 
         data = response.json()
